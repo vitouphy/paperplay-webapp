@@ -45,3 +45,17 @@ ol, ul {
   font-size: 24px;
   font-weight: bold;
 }
+
+.modal-box p {
+  padding-bottom: 24px;
+}
+
+.modal-box h2 {
+  margin-top: 18px;
+  margin-bottom: 12px;
+}
+
+.modal-box img {
+  margin: 28px auto;
+  border-radius: 32px;
+}

@@ -17,7 +17,7 @@ export default function Page() {
 
   return (
     <div className="flex h-screen">
-      <div className="bg-gray-800 text-white w-64 hidden lg:block">
+      {/* <div className="bg-gray-800 text-white w-64 hidden lg:block">
         <div className="p-4">
           <h2 className="text-xl font-semibold mb-4">Your App</h2>
         </div>
@@ -28,7 +28,7 @@ export default function Page() {
             </a>
           </li>
         </ul>
-      </div>
+      </div> */}
 
       <div className="flex-1 h-screen overflow-y-auto relative">
         <div className="m-14">
@@ -51,8 +51,17 @@ export default function Page() {
                 let parts = [];
                 for (let i = 0; i < scenes.length; i++) {
                   const scene = scenes[i];
+                  if (!scene.content || scene.content.trim() == "") {
+                    continue;
+                  }
+
                   parts.push(
-                    ...[`## Scene ${i + 1}\n\n`, scene.content, "\n\n"]
+                    ...[
+                      `## Scene ${i + 1}\n\n`,
+                      scene.content,
+                      `![Description of image](${scene.imageUrl})`,
+                      "\n\n",
+                    ]
                   );
                 }
 
@@ -65,15 +74,12 @@ export default function Page() {
                 document.getElementById("my_modal_2").showModal();
               }}
             >
-              Export
+              Read
             </button>
           )}
           <dialog id="my_modal_2" className="modal">
-            <div className="modal-box">
-              {/* <h3 className="font-bold text-lg">Story</h3> */}
-              {/* {exportContent && <Markdown>{parse(exportContent)}</Markdown>} */}
+            <div className="modal-box max-w-screen-lg px-14">
               <div className="export-container">{parse(exportContent)}</div>
-              {/* <div className="export-container">{parse("<h1>Hello</h1>")}</div> */}
             </div>
             <form method="dialog" className="modal-backdrop">
               <button>close</button>
