@@ -9,14 +9,26 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.15.0",
+    "@react-pdf/renderer": "^3.4.4",
+    "dotenv": "^16.4.5",
+    "html-pdf": "^3.0.1",
+    "html-react-parser": "^5.1.12",
+    "markdown-it": "^14.1.0",
     "next": "14.2.5",
+    "openai": "^4.55.4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-markdown": "^9.0.1",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
+    "@types/html-pdf": "^3.0.3",
+    "@types/markdown-it": "^14.1.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/uuid": "^10.0.0",
     "daisyui": "^4.12.10",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",

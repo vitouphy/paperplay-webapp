@@ -1,4 +1,20 @@
+"use client";
+
+import { useState } from "react";
+import { Scene } from "./common";
+import { SceneComponent } from "./components/Scene";
+import { generateRandomSceneSetup, generateScene } from "@/app/api/chat";
+import { EmptySetup } from "./components/EmptySetup";
+import { getEntireStory } from "./utils";
+import MarkdownIt from "markdown-it";
+import parse from "html-react-parser";
+
 export default function Page() {
+  const [activeSceneId, setActiveSceneId] = useState(0);
+  const [exportContent, setExportContent] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [scenes, setScenes] = useState<Scene[]>([]);
+
   return (
     <div className="flex h-screen">
       <div className="bg-gray-800 text-white w-64 hidden lg:block">
@@ -15,149 +31,119 @@ export default function Page() {
       </div>
 
       <div className="flex-1 h-screen overflow-y-auto relative">
-        <div className="p-8">
+        <div className="m-14">
           <div>
-            <h1 className="text-2xl font-bold mb-4">
-              Welcome to Your Dashboard
-            </h1>
-            <p>
-              This is where your main content goes. You can add articles,
-              charts, forms, and any other elements you need.
-            </p>
-            {/* Chat Boxes */}
-            <div>
-              <div className="chat chat-start">
-                <div className="chat-bubble">
-                  It's over Anakin,
-                  <br />I have the high ground.
-                </div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-start">
-                <div className="chat-bubble">
-                  It's over Anakin,
-                  <br />I have the high ground.
-                </div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-start">
-                <div className="chat-bubble">
-                  It's over Anakin,
-                  <br />I have the high ground.
-                </div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-start">
-                <div className="chat-bubble">
-                  It's over Anakin,
-                  <br />I have the high ground.
-                </div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-start">
-                <div className="chat-bubble">
-                  It's over Anakin,
-                  <br />I have the high ground.
-                </div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-start">
-                <div className="chat-bubble">
-                  It's over Anakin,
-                  <br />I have the high ground.
-                </div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-              <div className="chat chat-end">
-                <div className="chat-bubble">You underestimate my power!</div>
-              </div>
-            </div>
+            <h1 className="text-2xl font-bold mb-4">Story</h1>
           </div>
-        </div>
-        <div className="sticky bottom-0 bg-black p-2 pt-0">
-          <hr className="my-4 border-gray-800" />
+          {scenes.length == 0 && (
+            <EmptySetup
+              onGenerateSetup={async () => {
+                const setup = await generateRandomSceneSetup();
+                setScenes([{ setup, isAutomated: false, isDone: false }]);
+              }}
+            />
+          )}
+          {scenes.length > 1 && (
+            <button
+              className="btn btn-primary btn-outline mb-6"
+              onClick={() => {
+                // Build MD output
+                let parts = [];
+                for (let i = 0; i < scenes.length; i++) {
+                  const scene = scenes[i];
+                  parts.push(
+                    ...[`## Scene ${i + 1}\n\n`, scene.content, "\n\n"]
+                  );
+                }
 
-          <div className="bottom-0 w-full">
-            <form
-              // onSubmit={handleSubmit}
-              className="flex items-center p-2 space-x-2"
+                const content = parts.join("");
+
+                const md = new MarkdownIt();
+                const html = md.render(content);
+                setExportContent(html);
+
+                document.getElementById("my_modal_2").showModal();
+              }}
             >
-              <textarea
-                // value={message}
-                // onChange={(e) => setMessage(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1 p-2 border rounded-l-md resize-none"
-              />
-              <button
-                type="submit"
-                className="bg-blue-500 text-white p-2 rounded-r-md"
-              >
-                Send
-              </button>
+              Export
+            </button>
+          )}
+          <dialog id="my_modal_2" className="modal">
+            <div className="modal-box">
+              {/* <h3 className="font-bold text-lg">Story</h3> */}
+              {/* {exportContent && <Markdown>{parse(exportContent)}</Markdown>} */}
+              <div className="export-container">{parse(exportContent)}</div>
+              {/* <div className="export-container">{parse("<h1>Hello</h1>")}</div> */}
+            </div>
+            <form method="dialog" className="modal-backdrop">
+              <button>close</button>
             </form>
+          </dialog>
+           
+          <div role="tablist" className="tabs tabs-bordered w-full">
+            {scenes.map((scene, index) => (
+              <>
+                <input
+                  type="radio"
+                  name={`radio-${index}`}
+                  className="radio radio-primary"
+                  checked={index == activeSceneId}
+                  onClick={() => setActiveSceneId(index)}
+                />
+                <div
+                  role="tabpanel"
+                  className="tab-content p-10"
+                  key={`tab-content-${index}`}
+                  style={{
+                    display: activeSceneId === index ? "block" : "none",
+                  }}
+                >
+                  <SceneComponent
+                    key={`scene-${index}`}
+                    scene={scene}
+                    scenes={scenes}
+                    onUpdateScene={(updatedScene) => {
+                      const newList = scenes.map((originalScene, idx) =>
+                        idx === index ? updatedScene : originalScene
+                      );
+                      setScenes(newList);
+                    }}
+                    onAddScene={async (newScene) => {
+                      setLoading(true);
+                      // this also signals done because we add a new scene when we complete with the curernt scene
+                      scene.isDone = true;
+
+                      if (newScene.isAutomated) {
+                        // Automate the next scene by AI
+                        const newSceneStory = await generateScene(
+                          newScene.setup,
+                          getEntireStory(scenes)
+                        );
+                        newScene.isAutomated = true;
+                        newScene.content = newSceneStory;
+                        newScene.isDone = true;
+
+                        // Need to prepare for subsequent scene back to users
+                        const newUserScene: Scene = {
+                          setup: await generateRandomSceneSetup(
+                            getEntireStory([...scenes, newScene])
+                          ),
+                          isAutomated: false,
+                          isDone: false,
+                        };
+                        setScenes([...scenes, newScene, newUserScene]);
+                        setLoading(false);
+                      }
+                    }}
+                  />
+                </div>
+              </>
+            ))}
+          </div>
+          <div className="pl-10">
+            {loading && (
+              <span className="loading loading-dots loading-lg bg-primary"></span>
+            )}
           </div>
         </div>
       </div>

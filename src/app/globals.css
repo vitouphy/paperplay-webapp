@@ -31,3 +31,17 @@ body {
     text-wrap: balance;
   }
 }
+
+ol, ul {
+  list-style-type: disc;
+  padding-inline-start: 40px;
+}
+
+.export-container h1 {
+  font-size: 32px;
+}
+
+.export-container h2 {
+  font-size: 24px;
+  font-weight: bold;
+}
