@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# PaperPlay - Craft a story interactively with AI
 
-## Getting Started
+The motivation is to write a story without waiting for the perfect inspiration.
 
-First, run the development server:
+## Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Prepare API keys (Gemini and OpenAI).
+- Rename `.env.example` to `.env` and paste in your keys.
+- Install packages `npm install`
+- Run the development server `npm run dev`
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How it works
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+You are given by an objective and some constraints. You have to write the story that reaches that objective while satisfying all the constraints. Once you done with one scene, you think of the objective and the constraints that the next player has to write with. In this case, the next player is just an Gemini AI. You write back and forth until you have 5 or 7 scenes for a story.
 
-## Learn More
+![image01](./public/image01.png)
 
-To learn more about Next.js, take a look at the following resources:
+We can also generate an image to describe each scene. Once we have written some scenes, we can put everything in one page and enjoy the story.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+![image02](./public/image02.png)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Tools
 
-## Deploy on Vercel
+- Frontend and backend are powered by NextJS Framework, which uses ReactJS.
+- We use Gemini API for text generation and use OpenAI for image generation.
+  ![alt text](./public/img_architecture.png)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Others
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).

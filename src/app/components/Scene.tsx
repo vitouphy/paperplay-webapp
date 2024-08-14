@@ -97,8 +97,7 @@ const SceneComponent = ({
             className="btn btn-primary btn-outline mb-2 mt-6"
             onClick={async () => {
               setLoading(true);
-              const result = await criticController(scene?.content!, false, 1);
-              console.log("result: ", result);
+              const result = await criticController(scene?.content!, true, 1);
               if (result) {
                 scene.imageUrl = result;
                 onUpdateScene(scene);
