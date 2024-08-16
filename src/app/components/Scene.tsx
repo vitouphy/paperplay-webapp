@@ -1,4 +1,4 @@
-import { generateRandomSceneSetup, generateScene } from "@/app/api/chat";
+import { generateSceneSetup, generateScene } from "@/app/api/chat";
 import { Scene } from "../common";
 import Markdown from "react-markdown";
 import { useState } from "react";
@@ -8,15 +8,15 @@ import { criticController } from "../api/image";
 
 type SceneProps = {
   scene: Scene;
-  onUpdateScene: (scene: Scene) => void;
   onAddScene: (scene: Scene) => void;
+  onUpdateScene: (scene: Scene) => void;
   scenes: Scene[];
 };
 
 const SceneComponent = ({
   scene,
-  onUpdateScene,
   onAddScene,
+  onUpdateScene,
   scenes,
 }: SceneProps) => {
   const [loading, setLoading] = useState(false);
@@ -30,7 +30,7 @@ const SceneComponent = ({
   const entireStory = getEntireStory(scenes, scene);
 
   const generateSetup = async () => {
-    const setup = await generateRandomSceneSetup(entireStory);
+    const setup = await generateSceneSetup(entireStory);
     scene.setup = setup;
     onUpdateScene(scene);
   };
@@ -132,6 +132,9 @@ const SceneComponent = ({
           <button
             className="btn btn-primary btn-outline"
             onClick={() => {
+              scene.isDone = true;
+              onUpdateScene(scene);
+
               let newScene: Scene = {
                 setup: nextSetup,
                 isAutomated: true,

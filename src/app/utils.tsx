@@ -1,5 +1,6 @@
 import { randomBytes } from "crypto";
 import { Scene } from "./common";
+import MarkdownIt from "markdown-it";
 
 export const getEntireStory = (
   scenes: Scene[],
@@ -16,11 +17,37 @@ export const getEntireStory = (
     .join("\n");
 };
 
-export function generateRandomFilename(extension: string = "png"): string {
+export const getStoryInMarkdown = (scenes: Scene[]): string => {
+  let segments: string[] = [];
+
+  for (let i = 0; i < scenes.length; i++) {
+    const scene = scenes[i];
+    const hasContent = scene.content && scene.content.trim() != "";
+
+    if (hasContent) {
+      const imageSegment = scene.imageUrl
+        ? `![Description of image](${scene.imageUrl})`
+        : "";
+      segments.push(
+        ...[`## Scene ${i + 1}\n\n`, scene.content!, imageSegment, "\n\n"]
+      );
+    }
+  }
+
+  return segments.join("");
+};
+
+export const convertMarkdownToHtml = (markdown: string) => {
+  const md = new MarkdownIt();
+  const html = md.render(markdown);
+  return html;
+};
+
+export const generateRandomFilename = (extension: string = "png"): string => {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   const id = Array.from(randomBytes(16))
     .map((byte) => characters[byte % characters.length])
     .join("");
   return `${id}.${extension}`;
-}
+};

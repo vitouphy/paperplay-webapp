@@ -1,4 +1,8 @@
-const EmptySetup = ({ onGenerateSetup }: { onGenerateSetup: () => void }) => {
+type EmtpySetupProps = {
+  onGenerateSetup: () => void;
+};
+
+const EmptySetup = ({ onGenerateSetup }: EmtpySetupProps) => {
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <h2 className="text-lg font-medium text-gray-600 mt-24">

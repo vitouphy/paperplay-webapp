@@ -13,7 +13,7 @@ const generationConfig = {
   responseMimeType: "text/plain",
 };
 
-async function generateRandomSceneSetup(story?: string) {
+async function generateSceneSetup(story?: string): Promise<string> {
   const storySection = story
     ? `\n\nThe following are stories we have so far. Make sure to find setup that continues the story. \n\n ## Story \n\n${story}\n`
     : "";
@@ -46,4 +46,4 @@ async function generateScene(setup: string, story?: string) {
   return result.response.text();
 }
 
-export { generateRandomSceneSetup, generateScene };
+export { generateSceneSetup, generateScene };
