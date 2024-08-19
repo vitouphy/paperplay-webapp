@@ -4,18 +4,20 @@ import { createWriteStream } from "fs";
 import { get } from "https";
 import path, { join } from "path";
 import { generateRandomFilename } from "../utils";
-import { readFile } from "fs/promises";
-import {
-  GoogleGenerativeAI,
-  InlineDataPart,
-  Part,
-} from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Attempt, ImageCriticOutput } from "../common";
+import { generatePromptForImageGeneration } from "./imagePromptGenerator";
+import { getImageBlob } from "./utils";
 
 const apiKey = process.env.GEMINI_API_KEY || "";
 const genAI = new GoogleGenerativeAI(apiKey);
 const openAiApiKey = process.env.OPEN_AI_API_KEY || "";
 const openAiClient = new OpenAI({ apiKey: openAiApiKey });
+
+enum ImageModel {
+  DALLE_2,
+  DALLE_3,
+}
 
 const generationConfig = {
   temperature: 1,
@@ -30,59 +32,27 @@ const model = genAI.getGenerativeModel({
   generationConfig,
 });
 
-async function generateImage(prompt: string, useDalle3: boolean = false) {
-  const modelName = useDalle3 ? "dall-e-3" : "dall-e-2";
-  const size = useDalle3 ? "1024x1024" : "512x512";
-
-  const response = await openAiClient.images.generate({
-    model: modelName,
-    prompt: prompt,
-    size: size,
-    quality: "standard",
-    n: 1,
-  });
-
-  const imageUrl = response.data[0].url as string;
-  const filepath = await downloadImage(imageUrl);
-  return [imageUrl, filepath];
-}
-
-async function generateImagePrompt(
+export async function generateSceneImage(
   story: string,
-  attempts: Attempt[],
-  numRetries = 3
+  imageModel: ImageModel = ImageModel.DALLE_2
 ): Promise<string | null> {
-  let outputPrompt: string | null = null;
-  for (let i = 0; i < numRetries; i++) {
-    const promptInParts = await getImagePrompt(story, attempts);
-    const response = await model.generateContent(promptInParts);
-    outputPrompt = extractImagePromptOutput(response.response.text());
-
-    if (outputPrompt) break;
-  }
-  return outputPrompt;
+  return generateImageWithFeedbackLoops(story, imageModel);
 }
 
-async function criticController(
+async function generateImageWithFeedbackLoops(
   story: string,
-  useDalle3: boolean = false,
-  numAttempts: number = 3
+  imageModel: ImageModel = ImageModel.DALLE_2,
+  numFeedbackLoops: number = 3
 ): Promise<string | null> {
   const attempts: Attempt[] = [];
   let result = null;
 
-  for (let i = 0; i < numAttempts; i++) {
-    console.log(`======== iteration ${i} ========`);
-
-    const imagePrompt = await generateImagePrompt(story, attempts);
-    console.log("image prompt: ", imagePrompt);
-
-    result = await generateImage(imagePrompt!, useDalle3);
+  for (let i = 0; i < numFeedbackLoops; i++) {
+    const imagePrompt = await generatePromptForImageGeneration(story, attempts);
+    result = await generateImage(imagePrompt!, imageModel);
     const [imageUrl, imagePath] = result;
-    console.log("image_url: ", imageUrl);
 
     const critic = await criticImageOutput(imagePath, story, 3);
-    console.log("critic: ", critic);
 
     // Retry if something is wrong for whatever reason
     if (!critic) break;
@@ -105,6 +75,27 @@ async function criticController(
   }
 
   return result;
+}
+
+async function generateImage(
+  prompt: string,
+  imageModel: ImageModel = ImageModel.DALLE_2
+) {
+  const useDalle3 = imageModel == ImageModel.DALLE_3;
+  const modelName = useDalle3 ? "dall-e-3" : "dall-e-2";
+  const size = useDalle3 ? "1024x1024" : "512x512";
+
+  const response = await openAiClient.images.generate({
+    model: modelName,
+    prompt: prompt,
+    size: size,
+    quality: "standard",
+    n: 1,
+  });
+
+  const imageUrl = response.data[0].url as string;
+  const filepath = await downloadImage(imageUrl);
+  return [imageUrl, filepath];
 }
 
 async function criticImageOutput(
@@ -191,93 +182,3 @@ async function downloadImage(url: string): Promise<string> {
     });
   });
 }
-
-async function getAttempts(attempts: Attempt[]): Promise<Part[]> {
-  if (!attempts.length) {
-    return [];
-  }
-
-  const attemptParts: Part[] = [];
-  for (let i = 0; i < attempts.length; i++) {
-    const attempt = attempts[i];
-    attemptParts.push(
-      {
-        text: `
-            ### Attempt ${i + 1}
-            # Prompt: ${attempt.imagePrompt}
-            # Reason: ${attempt.reason}
-            # Improvement Tips: ${attempt.improvement}
-            # Image: 
-            `,
-      },
-      await getImageBlob(attempt.imagePath)
-    );
-  }
-
-  return attemptParts;
-}
-
-async function getImagePrompt(
-  story: string,
-  attempts: Attempt[]
-): Promise<Part[]> {
-  const instructionPart = [
-    {
-      text: `
-        Write a prompt for AI image generation for models like Imagen, Stable Diffusion, or Dall-E. The image should be based on the story below. 
-        The prompt needs to be short, concise, and capture the core essence of the story. Avoid inappropriate content.
-        "Attempt History" section holds the output prompt that has been attempted and require further improvement. 
-
-        Think step by step in the "Thought" section. 
-        Finally, output the prompt in the Output section.
-
-        ## Story
-        ${story}
-
-        ## Attempt History
-
-        `,
-    },
-  ];
-
-  const outputPart = [
-    {
-      text: `
-        ## Thought
-        Write thought here
-
-        ## Output
-        `,
-    },
-  ];
-
-  const attemptsPart = await getAttempts(attempts);
-
-  const arr = [...instructionPart, ...attemptsPart, ...outputPart];
-  return arr;
-}
-
-function extractImagePromptOutput(text: string): string | null {
-  const target = "# Output";
-  const i = text.indexOf(target);
-  if (i !== -1) {
-    return text.slice(i + target.length).trim();
-  }
-  return null;
-}
-
-async function getImageBlob(imagePath: string): Promise<InlineDataPart> {
-  try {
-    const fileBuffer = await readFile(imagePath);
-    return {
-      inlineData: {
-        mimeType: "image/png",
-        data: fileBuffer.toString("base64"),
-      },
-    };
-  } catch (error) {
-    throw new Error(`Error reading file: ${error}`);
-  }
-}
-
-export { generateImage, generateImagePrompt, criticController };

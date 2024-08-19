@@ -23,7 +23,18 @@ This is a bad goal because it's too big to be done in an early scene.
 
 [STORY_SECTION]
 
-Generate a setup that only contains goal and constraints.
+### Output Format
+
+"""
+## Setup:
+**Goal**: 
+
+**Constraints**:
+- 
+- 
+"""
+
+Generate a setup that only contains goal and constraints, following the output format.
 `;
 
 export const PROMPT_SCENE_WRITE = `

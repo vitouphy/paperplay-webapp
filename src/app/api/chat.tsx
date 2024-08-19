@@ -6,6 +6,7 @@ import {
   PROMPT_SCENE_WRITE,
   PROMPT_STORY_SECTION,
 } from "./prompts";
+import { extractSectionFromResponse } from "./utils";
 
 const apiKey = process.env.GEMINI_API_KEY || "";
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -55,10 +56,4 @@ function createModelAndStartSession(prompt: string): ChatSession {
 
   const chatSession = model.startChat({ generationConfig });
   return chatSession;
-}
-
-function extractSectionFromResponse(sectionName: string, text: string): string {
-  return text.startsWith(sectionName)
-    ? text.slice(sectionName.length).trimStart()
-    : text;
 }

@@ -4,7 +4,7 @@ import Markdown from "react-markdown";
 import { useState } from "react";
 import { getEntireStory } from "../utils";
 import * as uuid from "uuid";
-import { criticController } from "../api/image";
+import { generateSceneImage } from "../api/image";
 
 type SceneProps = {
   scene: Scene;
@@ -97,7 +97,7 @@ const SceneComponent = ({
             className="btn btn-primary btn-outline mb-2 mt-6"
             onClick={async () => {
               setLoading(true);
-              const result = await criticController(scene?.content!, true, 1);
+              const result = await generateSceneImage(scene?.content!);
               if (result) {
                 scene.imageUrl = result;
                 onUpdateScene(scene);
