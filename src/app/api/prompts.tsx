@@ -72,3 +72,25 @@ The following are stories we have so far. Make sure to find setup that continues
 
 [STORY_SECTION]
 `;
+
+export const PROMPT_EVALUAGE_IMAGE_WITH_STORY = `
+Does the image reflect the core of the story? The main character needs to be in the picture. The image has to be good quality. Avoid unclear images.
+Think step by step in the #Thought section. 
+Then, give a thorough and concise reason why the image is a fit or a misfit and put it in the #reason section.
+Then, if the image is a misfit, give suggestions on how to improve. Write N/A if the image fits. Write in the #improvement section.
+Finally, decide if the image matches with the core of the story. 0 if the image does not match. 1 if the image matches.
+
+# Story
+[STORY]
+
+# Thought
+// write the thought step by step here
+
+# Reason
+// provide reason here
+
+# Improvement
+
+# Decision 
+// it should be a 1 or 0.
+`;

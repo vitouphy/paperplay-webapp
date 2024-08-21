@@ -13,9 +13,14 @@ export type Attempt = {
   imagePath: string;
 };
 
-export type ImageCriticOutput = {
+export type ImageEvaluation = {
   output: string;
   reason: string;
   improvement: string;
   decision: number;
 };
+
+export enum ImageModel {
+  DALLE_2,
+  DALLE_3,
+}

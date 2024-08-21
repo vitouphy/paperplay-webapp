@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Scene } from "./common";
 import { SceneComponent } from "./components/Scene";
-import { generateSceneSetup, generateScene } from "@/app/api/chat";
+import { generateSceneSetup, generateScene } from "@/app/api/story";
 import { EmptySetup } from "./components/EmptySetup";
 import {
   convertMarkdownToHtml,
