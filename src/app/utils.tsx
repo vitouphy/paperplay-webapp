@@ -1,4 +1,5 @@
-import { randomBytes } from "crypto";
+"use client";
+
 import { Scene } from "./common";
 import MarkdownIt from "markdown-it";
 
@@ -41,13 +42,4 @@ export const convertMarkdownToHtml = (markdown: string) => {
   const md = new MarkdownIt();
   const html = md.render(markdown);
   return html;
-};
-
-export const generateRandomFilename = (extension: string = "png"): string => {
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const id = Array.from(randomBytes(16))
-    .map((byte) => characters[byte % characters.length])
-    .join("");
-  return `${id}.${extension}`;
 };

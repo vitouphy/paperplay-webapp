@@ -2,11 +2,10 @@
 import { OpenAI } from "openai";
 import { createWriteStream } from "fs";
 import { get } from "https";
-import path, { join } from "path";
-import { generateRandomFilename } from "../utils";
+import { join } from "path";
 import { Attempt, ImageEvaluation, ImageModel } from "../common";
 import { generatePromptForImageGeneration } from "./imagePromptGenerator";
-import { getImageBlob } from "./utils";
+import { generateRandomFilename, getImageBlob } from "./utils";
 import { getGemini } from "./gemini";
 import { PROMPT_EVALUAGE_IMAGE_WITH_STORY } from "./prompts";
 
@@ -25,13 +24,13 @@ async function generateImageWithFeedbackLoops(
   imageModel: ImageModel = ImageModel.DALLE_2,
   numFeedbackLoops: number = 3
 ): Promise<string> {
-  let imagePath = null;
+  let generatedImage = null;
   const attempts: Attempt[] = [];
   for (let i = 0; i < numFeedbackLoops; i++) {
     const imagePrompt = await generatePromptForImageGeneration(story, attempts);
-    const generatedImage = await generateImage(imagePrompt, imageModel);
+    generatedImage = await generateImage(imagePrompt, imageModel);
 
-    imagePath = generatedImage.imagePath;
+    const { imagePath } = generatedImage;
     const imageEvaluation = await evaluateImageWithStory(imagePath, story, 3);
 
     if (imageEvaluation.decision === 1) break;
@@ -44,9 +43,8 @@ async function generateImageWithFeedbackLoops(
     });
   }
 
-  if (imagePath) {
-    const baseDir = join(process.cwd(), "public");
-    return path.relative(baseDir, imagePath);
+  if (generatedImage) {
+    return join("/api", "file", generatedImage.filename);
   }
 
   throw Error(
@@ -71,8 +69,10 @@ async function generateImage(
   });
 
   const imageUrl = response.data[0].url as string;
-  const imagePath = await downloadImage(imageUrl);
-  return { imageUrl, imagePath };
+  const filename = generateRandomFilename();
+  const imagePath = await downloadImage(imageUrl, filename);
+
+  return { imageUrl, imagePath, filename };
 }
 
 async function evaluateImageWithStory(
@@ -132,13 +132,11 @@ function extractImageEvaluationFromLLMResponse(
   };
 }
 
-async function downloadImage(url: string): Promise<string> {
-  const filename = generateRandomFilename();
+async function downloadImage(url: string, filename: string): Promise<string> {
   const filepath = join(process.cwd(), "public", "downloads", filename);
 
   return new Promise((resolve, reject) => {
     const file = createWriteStream(filepath);
-
     get(url, (response) => {
       response.pipe(file);
       file.on("finish", () => {

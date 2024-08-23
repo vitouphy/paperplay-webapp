@@ -5,6 +5,7 @@ import { useState } from "react";
 import { getEntireStory } from "../utils";
 import * as uuid from "uuid";
 import { generateSceneImage } from "../api/image";
+import Image from "next/image";
 
 const SETUP_TEMPLATE =
   "Goal: Write something here\nConstraints:\n- Write something here\n-";
@@ -148,7 +149,16 @@ const SceneComponent = ({
         </div>
       </button>
 
-      <img src={scene.imageUrl} />
+      {scene.imageUrl && (
+        <Image
+          className="rounded-lg max-w-screen-sm"
+          src={scene.imageUrl!}
+          alt={"Image"}
+          width={512}
+          height={512}
+          layout="responsive"
+        />
+      )}
     </div>
   );
 

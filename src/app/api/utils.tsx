@@ -1,4 +1,5 @@
 import { InlineDataPart } from "@google/generative-ai";
+import { randomBytes } from "crypto";
 import { readFile } from "fs/promises";
 
 function extractSectionFromResponse(sectionName: string, text: string): string {
@@ -23,5 +24,13 @@ async function getImageBlob(imagePath: string): Promise<InlineDataPart> {
     throw new Error(`Error reading file: ${error}`);
   }
 }
+function generateRandomFilename(extension: string = "png"): string {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const id = Array.from(randomBytes(16))
+    .map((byte) => characters[byte % characters.length])
+    .join("");
+  return `${id}.${extension}`;
+}
 
-export { extractSectionFromResponse, getImageBlob };
+export { extractSectionFromResponse, getImageBlob, generateRandomFilename };
