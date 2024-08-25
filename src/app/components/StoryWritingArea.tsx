@@ -65,7 +65,7 @@ const RadioGroup = ({
     <input
       type="radio"
       key={`radio-${sceneIndex}`}
-      className="radio radio-primary"
+      className={`radio ${scene.isDone ? "radio-success" : "radio-primary"}`}
       checked={sceneIndex == activeSceneId}
       onChange={() => onUpdateActiveSceneId(sceneIndex)}
     />
