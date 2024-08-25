@@ -1,8 +1,13 @@
 type EmtpySetupProps = {
   onGenerateSetup: () => void;
+  shouldRender: boolean;
 };
 
-const EmptySetup = ({ onGenerateSetup }: EmtpySetupProps) => {
+const EmptySetup = ({ onGenerateSetup, shouldRender }: EmtpySetupProps) => {
+  if (!shouldRender) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col items-center justify-center h-full">
       <h2 className="text-lg font-medium text-gray-600 mt-24">
