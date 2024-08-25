@@ -2,7 +2,9 @@
 
 The motivation is to write a story without waiting for the perfect inspiration.
 
-## Setup
+# Setup
+
+### Setup from source
 
 - Prepare API keys (Gemini and OpenAI).
 - Rename `.env.example` to `.env` and paste in your keys.
@@ -10,6 +12,24 @@ The motivation is to write a story without waiting for the perfect inspiration.
 - Run the development server `npm run dev`
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Setup with Docker
+
+If you'd prefer to run the project using Docker, follow these steps:
+
+- Make sure you have your API keys (Gemini and OpenAI) ready.
+- Rename `.env.example` to `.env` and paste in your keys.
+- Pull the Docker image from Docker Hub:
+  ```
+  docker pull vitouphy/paperplay
+  ```
+- Run the Docker container with the following command:
+  ```
+  docker run --rm -p 3000:3000 --env-file .env vitouphy/paperplay
+  ```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+This process will spin up the application inside a Docker container, exposing it on port 3000.
 
 ## How it works
 
