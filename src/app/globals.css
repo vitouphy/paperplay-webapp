@@ -59,3 +59,8 @@ ol, ul {
   margin: 28px auto;
   border-radius: 32px;
 }
+
+.markdown-viewer p {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}

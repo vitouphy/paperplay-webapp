@@ -1,21 +1,26 @@
 import { generateSceneSetup, generateScene } from "@/app/api/story";
 import { ImageModel, Scene } from "../common";
-import Markdown from "react-markdown";
 import { useState } from "react";
 import { getEntireStory } from "../utils";
 import * as uuid from "uuid";
 import { generateSceneImage } from "../api/image";
 import Image from "next/image";
+import Markdown from "react-markdown";
 
 const SETUP_TEMPLATE =
-  "Goal: Write something here\nConstraints:\n- Write something here\n-";
+  "**Goal**: Write something here\n\n**Constraints**:\n- Write something here\n-";
 
 const SceneComponent = ({
   scene,
   onAddScene,
   onUpdateScene,
   scenes,
-}: SceneProps) => {
+}: {
+  scene: Scene;
+  onAddScene: (scene: Scene) => void;
+  onUpdateScene: (scene: Scene) => void;
+  scenes: Scene[];
+}) => {
   const [loading, setLoading] = useState(false);
   const [nextSetup, setNextSetup] = useState(SETUP_TEMPLATE);
 
@@ -172,13 +177,6 @@ const SceneComponent = ({
       {scene.isDone && GenerateImageButton}
     </div>
   );
-};
-
-type SceneProps = {
-  scene: Scene;
-  onAddScene: (scene: Scene) => void;
-  onUpdateScene: (scene: Scene) => void;
-  scenes: Scene[];
 };
 
 export { SceneComponent };
