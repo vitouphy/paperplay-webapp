@@ -1,14 +1,13 @@
-import { generateSceneSetup, generateScene } from "@/app/api/story";
-import { ImageModel, Scene } from "../common";
-import { useState } from "react";
+import { generateSceneSetup } from "@/app/api/story";
+import { Scene } from "../common";
+import { ChangeEvent } from "react";
 import { getEntireStory } from "../utils";
-import * as uuid from "uuid";
-import { generateSceneImage } from "../api/image";
-import Image from "next/image";
-import Markdown from "react-markdown";
 
-const SETUP_TEMPLATE =
-  "**Goal**: Write something here\n\n**Constraints**:\n- Write something here\n-";
+import Image from "next/image";
+import { GenerateImageButton } from "./GenerateImageButton";
+import { SceneCompleteButton } from "./SceneCompleteButton";
+import { GenerateStoryButton } from "./GenerateStoryButton";
+import { SetupViewer } from "./SetupViewer";
 
 const SceneComponent = ({
   scene,
@@ -21,139 +20,76 @@ const SceneComponent = ({
   onUpdateScene: (scene: Scene) => void;
   scenes: Scene[];
 }) => {
-  const [loading, setLoading] = useState(false);
-  const [nextSetup, setNextSetup] = useState(SETUP_TEMPLATE);
-
   if (!scene) return null;
 
-  const modalId = uuid.v4() as string;
   const entireStory = getEntireStory(scenes, scene);
-  const isSceneHasStory = scene.content && scene.content?.trim() !== "";
+  const isSceneHasStory = scene.content != null && scene.content?.trim() !== "";
   const shouldShowDoneButton = !scene.isDone && isSceneHasStory;
 
-  const generateSetup = async () => {
+  const generateNewSetup = async () => {
     const setup = await generateSceneSetup(entireStory);
     scene.setup = setup;
     onUpdateScene(scene);
   };
 
-  const generateStory = async () => {
-    const story = await generateScene(scene.setup, entireStory);
+  const onStoryTextAreaUpdated = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    scene.content = e.target.value;
+    onUpdateScene(scene);
+  };
+
+  const onSceneComplete = () => {
+    scene.isDone = true;
+    onUpdateScene(scene);
+  };
+
+  const onNewSetupAvailable = (setup: string) => {
+    onAddScene({
+      setup: setup,
+      isAutomated: true,
+      isDone: false,
+    });
+  };
+
+  const onImageGenerated = (imageUrl: string) => {
+    scene.imageUrl = imageUrl;
+    onUpdateScene(scene);
+  };
+
+  const onStoryGenerated = async (story: string) => {
     scene.content = story;
     onUpdateScene(scene);
   };
 
-  const SetupViewer = (
-    <div className="container mx-auto p-4 dark:bg-gray-700 bg-gray-300 rounded-md font-sans text-md">
-      <Markdown>{scene.setup}</Markdown>
-      {!scene.isDone && (
-        <button
-          className="btn btn-sm btn-outline btn-primary"
-          onClick={generateSetup}
-        >
-          Re-Generate
-        </button>
-      )}
-    </div>
-  );
-
-  const WriteWithAIButton = (
-    <button
-      className="btn btn-sm btn-outline btn-primary mb-2"
-      onClick={generateStory}
-    >
-      Write with AI
-    </button>
-  );
-
-  const ShowDoneButton = (
-    <>
-      <button
-        className="btn btn-primary btn-outline"
-        onClick={() => {
-          const modal = document.getElementById(modalId) as HTMLDialogElement;
-          modal.showModal();
-        }}
-      >
-        Done
-      </button>
-      <dialog id={modalId} className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">Setup for Next Scene</h3>
-          <p className="py-4">
-            Before proceed, please leave a setup for the next scene.
-          </p>
-          <textarea
-            className="textarea textarea-bordered w-full"
-            rows={6}
-            value={nextSetup}
-            onChange={(e) => setNextSetup(e.target.value)}
-          ></textarea>
-          <button
-            className="btn btn-primary btn-outline"
-            onClick={() => {
-              scene.isDone = true;
-              onUpdateScene(scene);
-              onAddScene({
-                setup: nextSetup,
-                isAutomated: true,
-                isDone: false,
-              });
-
-              const modal = document.getElementById(
-                modalId
-              ) as HTMLDialogElement;
-              modal.close();
-            }}
-          >
-            Submit
-          </button>
-        </div>
-        <form method="dialog" className="modal-backdrop">
-          <button>close</button>
-        </form>
-      </dialog>
-    </>
-  );
-
-  const ContentWritingArea = (
-    <div className=" w-full">
-      <textarea
-        value={scene.content}
-        onChange={(e) => {
-          scene.content = e.target.value;
-          onUpdateScene(scene);
-        }}
-        readOnly={scene.isDone}
-        placeholder="Type your message..."
-        className="textarea flex-1 p-2 border rounded-md resize-none w-full"
-        rows={12}
-      />
-    </div>
-  );
-
-  const GenerateImageButton = (
+  return (
     <div>
-      <button
-        className="btn btn-primary btn-outline mb-2 mt-6"
-        onClick={async () => {
-          setLoading(true);
-          scene.imageUrl = await generateSceneImage(
-            scene?.content!,
-            ImageModel.DALLE_3
-          );
-          onUpdateScene(scene);
-          setLoading(false);
-        }}
-      >
-        Generate Image{" "}
-        <div>
-          {loading && (
-            <span className="loading loading-spinner loading-md bg-primary"></span>
-          )}
-        </div>
-      </button>
-
+      <SetupViewer scene={scene} onRequestNewSetup={generateNewSetup} />
+      <br />
+      <GenerateStoryButton
+        setup={scene.setup}
+        entireStory={entireStory}
+        shouldRender={!scene.isDone}
+        onStoryGenerated={onStoryGenerated}
+      />
+      <div className="w-full">
+        <textarea
+          value={scene.content}
+          onChange={onStoryTextAreaUpdated}
+          readOnly={scene.isDone}
+          placeholder="Type your message..."
+          className="textarea flex-1 p-2 border rounded-md resize-none w-full"
+          rows={12}
+        />
+      </div>
+      <SceneCompleteButton
+        shouldRender={shouldShowDoneButton}
+        onSceneComplete={onSceneComplete}
+        onNewSetupAvailable={onNewSetupAvailable}
+      />
+      <GenerateImageButton
+        shouldRender={scene.isDone}
+        scene={scene}
+        onImageGenerated={onImageGenerated}
+      />
       {scene.imageUrl && (
         <Image
           className="rounded-lg max-w-screen-sm"
@@ -164,17 +100,6 @@ const SceneComponent = ({
           layout="responsive"
         />
       )}
-    </div>
-  );
-
-  return (
-    <div>
-      {SetupViewer}
-      <br />
-      <div>{!scene.isDone && WriteWithAIButton}</div>
-      {ContentWritingArea}
-      {shouldShowDoneButton && ShowDoneButton}
-      {scene.isDone && GenerateImageButton}
     </div>
   );
 };

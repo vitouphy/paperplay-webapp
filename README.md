@@ -45,7 +45,8 @@ We can also generate an image to describe each scene. Once we have written some 
 
 - Frontend and backend are powered by NextJS Framework, which uses ReactJS.
 - We use Gemini API for text generation and use OpenAI for image generation.
-  ![alt text](./public/img_architecture.png)
+
+  ![system architecture](./public/architecture.png)
 
 ## Others
 
