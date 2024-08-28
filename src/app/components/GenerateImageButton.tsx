@@ -1,45 +1,44 @@
-import { useState } from "react";
-import { generateSceneImage } from "../api/image";
-import { Scene, ImageModel } from "../common";
+import { Scene } from "../common";
+import { useImageGenerator } from "../hooks/useImageGenerator";
+
+type GenerateImageButtonProps = {
+  scene: Scene;
+  shouldRender: boolean;
+  onImageGenerated: (imageUrl: string) => void;
+};
 
 const GenerateImageButton = ({
   scene,
   shouldRender,
   onImageGenerated,
-}: {
-  scene: Scene;
-  shouldRender: boolean;
-  onImageGenerated: (imageUrl: string) => void;
-}) => {
-  const [loading, setLoading] = useState(false);
-
+}: GenerateImageButtonProps) => {
+  const { loading, error, generateImage } = useImageGenerator();
   if (!shouldRender) {
     return null;
   }
 
   const onClickGenerateImage = async () => {
-    setLoading(true);
-    const imageUrl = await generateSceneImage(
-      scene?.content!,
-      ImageModel.DALLE_3
-    );
-
-    setLoading(false);
-    onImageGenerated(imageUrl);
+    const imageUrl = await generateImage(scene?.content!);
+    if (imageUrl) {
+      onImageGenerated(imageUrl);
+    }
   };
 
   return (
-    <button
-      className="btn btn-primary btn-outline mb-2 mt-6"
-      onClick={onClickGenerateImage}
-    >
-      Generate Image{" "}
-      <div>
-        {loading && (
-          <span className="loading loading-spinner loading-md bg-primary"></span>
-        )}
-      </div>
-    </button>
+    <>
+      {error && <div className="text-red-500 mb-2">Error: {error.message}</div>}
+      <button
+        className="btn btn-primary btn-outline mb-2 mt-6"
+        onClick={onClickGenerateImage}
+      >
+        Generate Image{" "}
+        <div>
+          {loading && (
+            <span className="loading loading-spinner loading-md bg-primary"></span>
+          )}
+        </div>
+      </button>
+    </>
   );
 };
 

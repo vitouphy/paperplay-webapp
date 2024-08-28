@@ -29,7 +29,7 @@ const SceneCompleteButton = ({
           modal.showModal();
         }}
       >
-        Done
+        Complete & Continue
       </button>
       <dialog id={modalId} className="modal">
         <div className="modal-box">

@@ -4,13 +4,15 @@ import { Scene } from "../common";
 import { getEntireStory } from "../utils";
 import { SceneComponent } from "./Scene";
 
+type StoryWritingAreaProps = {
+  scenes: Scene[];
+  onUpdateScenes: (scenes: Scene[]) => void;
+};
+
 const StoryWritingArea = ({
   scenes,
   onUpdateScenes,
-}: {
-  scenes: Scene[];
-  onUpdateScenes: (scene: Scene[]) => void;
-}) => {
+}: StoryWritingAreaProps) => {
   const [activeSceneId, setActiveSceneId] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -61,15 +63,21 @@ const RadioGroup = ({
   activeSceneId: number;
   onUpdateActiveSceneId: (activeSceneId: number) => void;
 }) => {
-  return scenes.map((scene, sceneIndex) => (
-    <input
-      type="radio"
-      key={`radio-${sceneIndex}`}
-      className={`radio ${scene.isDone ? "radio-success" : "radio-primary"}`}
-      checked={sceneIndex == activeSceneId}
-      onChange={() => onUpdateActiveSceneId(sceneIndex)}
-    />
-  ));
+  return (
+    <div className="space-x-2 mb-4">
+      {scenes.map((scene, sceneIndex) => (
+        <input
+          type="radio"
+          key={`radio-${sceneIndex}`}
+          className={`radio ${
+            scene.isDone ? "radio-success" : "radio-primary"
+          }`}
+          checked={sceneIndex == activeSceneId}
+          onChange={() => onUpdateActiveSceneId(sceneIndex)}
+        />
+      ))}
+    </div>
+  );
 };
 
 const SceneGroup = ({

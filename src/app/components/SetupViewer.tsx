@@ -9,7 +9,7 @@ const SetupViewer = ({
   onRequestNewSetup: () => void;
 }) => {
   return (
-    <div className="container mx-auto p-4 dark:bg-gray-700 bg-gray-300 rounded-md font-sans text-md">
+    <div className="container mx-0 p-4 dark:bg-gray-700 bg-gray-300 rounded-md font-sans text-md">
       <Markdown>{scene.setup}</Markdown>
       {!scene.isDone && (
         <button

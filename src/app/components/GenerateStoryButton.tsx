@@ -1,32 +1,42 @@
-import { generateScene } from "../api/story";
+import { useGenerateStory } from "../hooks/useStoryGenerator";
+
+type GenerateStoryButtonProps = {
+  setup: string;
+  entireStory: string;
+  shouldRender: boolean;
+  onStoryGenerated: (story: string) => void;
+};
 
 const GenerateStoryButton = ({
   setup,
   entireStory,
   shouldRender,
   onStoryGenerated,
-}: {
-  setup: string;
-  entireStory: string;
-  shouldRender: boolean;
-  onStoryGenerated: (story: string) => void;
-}) => {
+}: GenerateStoryButtonProps) => {
+  const { loading, error, generateStory } = useGenerateStory();
   if (!shouldRender) {
     return null;
   }
 
-  const generateStory = async () => {
-    const story = await generateScene(setup, entireStory);
-    onStoryGenerated(story);
+  const onClickGenerateStory = async () => {
+    const story = await generateStory(setup, entireStory);
+    if (story) {
+      onStoryGenerated(story);
+    }
   };
-
   return (
-    <button
-      className="btn btn-sm btn-outline btn-primary mb-2"
-      onClick={generateStory}
-    >
-      Write with AI
-    </button>
+    <>
+      {error && <div className="text-red-500 mb-2">Error: {error.message}</div>}
+      <button
+        className="btn btn-sm btn-outline btn-primary mt-4"
+        onClick={onClickGenerateStory}
+      >
+        Write with AI
+        {loading && (
+          <span className="loading loading-spinner loading-sm ml-2"></span>
+        )}
+      </button>
+    </>
   );
 };
 
