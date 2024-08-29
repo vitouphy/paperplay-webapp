@@ -4,15 +4,12 @@ import { Scene } from "../common";
 import { getEntireStory } from "../utils";
 import { SceneComponent } from "./Scene";
 
-type StoryWritingAreaProps = {
+type StoryEditorProps = {
   scenes: Scene[];
   onUpdateScenes: (scenes: Scene[]) => void;
 };
 
-const StoryWritingArea = ({
-  scenes,
-  onUpdateScenes,
-}: StoryWritingAreaProps) => {
+const StoryEditor = ({ scenes, onUpdateScenes }: StoryEditorProps) => {
   const [activeSceneId, setActiveSceneId] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -64,7 +61,7 @@ const RadioGroup = ({
   onUpdateActiveSceneId: (activeSceneId: number) => void;
 }) => {
   return (
-    <div className="space-x-2 mb-4">
+    <div className="space-x-2 mb-4 min-w-28">
       {scenes.map((scene, sceneIndex) => (
         <input
           type="radio"
@@ -94,7 +91,7 @@ const SceneGroup = ({
   return scenes.map((scene, sceneIndex) => (
     <div
       role="tabpanel"
-      className="tab-content p-10"
+      className="tab-content p-0 md:p-10"
       key={`tab-content-${sceneIndex}`}
       style={{
         display: activeSceneId === sceneIndex ? "block" : "none",
@@ -145,4 +142,4 @@ const getNextSceneForUser = async (scenes: Scene[]): Promise<Scene> => {
   return newScene;
 };
 
-export { StoryWritingArea };
+export { StoryEditor };

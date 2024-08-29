@@ -5,7 +5,7 @@ import { getEntireStory } from "../utils";
 import { GenerateImageButton } from "./GenerateImageButton";
 import { SceneCompleteButton } from "./SceneCompleteButton";
 import { GenerateStoryButton } from "./GenerateStoryButton";
-import { SetupViewer } from "./SetupViewer";
+import { SceneSetupViewer } from "./SceneSetupViewer";
 import { useSetupGenerator } from "../hooks/useSetupGenerator";
 
 type SceneComponentProps = {
@@ -64,7 +64,7 @@ const SceneComponent = ({
 
   return (
     <div>
-      <SetupViewer scene={scene} onRequestNewSetup={generateNewSetup} />
+      <SceneSetupViewer scene={scene} onRequestNewSetup={generateNewSetup} />
       <GenerateStoryButton
         setup={scene.setup}
         entireStory={entireStory}

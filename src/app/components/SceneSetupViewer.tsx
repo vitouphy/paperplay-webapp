@@ -1,15 +1,17 @@
 import Markdown from "react-markdown";
 import { Scene } from "../common";
 
-const SetupViewer = ({
-  scene,
-  onRequestNewSetup,
-}: {
+type SceneSetupViewerProps = {
   scene: Scene;
   onRequestNewSetup: () => void;
-}) => {
+};
+
+const SceneSetupViewer = ({
+  scene,
+  onRequestNewSetup,
+}: SceneSetupViewerProps) => {
   return (
-    <div className="container mx-0 p-4 dark:bg-gray-700 bg-gray-300 rounded-md font-sans text-md">
+    <div className="w-full mx-0 p-4 dark:bg-gray-700 bg-gray-300 rounded-md font-sans text-md">
       <Markdown>{scene.setup}</Markdown>
       {!scene.isDone && (
         <button
@@ -23,4 +25,4 @@ const SetupViewer = ({
   );
 };
 
-export { SetupViewer };
+export { SceneSetupViewer };

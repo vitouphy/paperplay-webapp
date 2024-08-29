@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Scene } from "./common";
 import { generateSceneSetup } from "@/app/api/story";
 import { EmptySetup } from "./components/EmptySetup";
-import { StoryReaderArea } from "./components/StoryReaderArea";
-import { StoryWritingArea } from "./components/StoryWritingArea";
+import { StoryEditor } from "./components/StoryEditor";
+import { StoryPreview } from "./components/StoryPreview";
 
 export default function Page() {
   const [scenes, setScenes] = useState<Scene[]>([]);
@@ -24,8 +24,8 @@ export default function Page() {
             shouldRender={scenes.length == 0}
             onGenerateSetup={generateSetup}
           />
-          <StoryReaderArea shouldRender={scenes.length > 1} scenes={scenes} />
-          <StoryWritingArea
+          <StoryPreview shouldRender={scenes.length > 1} scenes={scenes} />
+          <StoryEditor
             scenes={scenes}
             onUpdateScenes={(scenes) => setScenes([...scenes])}
           />

@@ -4,13 +4,12 @@ import { getStoryInMarkdown, convertMarkdownToHtml } from "../utils";
 import parse from "html-react-parser";
 import { createCanvas, createPDF } from "../utils/pdfUtils";
 
-const StoryReaderArea = ({
-  shouldRender,
-  scenes,
-}: {
+type StoryPreviewProps = {
   shouldRender: boolean;
   scenes: Scene[];
-}) => {
+};
+
+const StoryPreview = ({ shouldRender, scenes }: StoryPreviewProps) => {
   const [story, setStory] = useState("");
 
   if (!shouldRender) {
@@ -66,4 +65,4 @@ const StoryReaderArea = ({
   );
 };
 
-export { StoryReaderArea };
+export { StoryPreview };

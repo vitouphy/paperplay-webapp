@@ -62,7 +62,7 @@ This is a bad goal because it's too big to be done in an early scene.
 
 [STORY_SECTION] 
 
-Given a setup that contains a goal and constraits, continue writing the story that reaches the goal while satisfying all the constraints.
+Given a setup that contains a goal and constraits, continue writing the story that reaches the goal while satisfying all the constraints. Start the story directly and skip the Scene number.
 `;
 
 export const PROMPT_STORY_SECTION = `
